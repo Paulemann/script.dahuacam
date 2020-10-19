@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+  <string id="32000">Camera Setup</string>
+  <string id="32001">Name:</string>
+  <string id="32002">IP-Adresse:</string>
+  <string id="32003">Benutzer:</string>
+  <string id="32004">Passwort:</string>
+  <string id="33000">Dahua Cam Playback</string>
+  <string id="33001">Dateityp:</string>
+  <string id="33002">Kalendermonat:</string>
+  <string id="33003">Kalenderjahr:</string>
+  <string id="33004">Aufnahmen:</string>
+  <string id="33005">Startzeit:</string>
+  <string id="33006">Endzeit:</string>
+  <string id="33007">Dateigröße:</string>
+  <string id="33008">Status:</string>
+  <string id="33009">IP-Adresse:</string>
+  <string id="33010">Beenden</string>
+  <string id="33011">Abspielen</string>
+  <string id="33012">Sichern</string>
+  <string id="33013">{}% von {} MB belegt</string>
+  <string id="33014">Ein Fehler ist aufgetreten</string>
+  <string id="33020">Mo</string>
+  <string id="33021">Di</string>
+  <string id="33022">Mi</string>
+  <string id="33023">Do</string>
+  <string id="33024">Fr</string>
+  <string id="33025">Sa</string>
+  <string id="33026">So</string>
+</strings>

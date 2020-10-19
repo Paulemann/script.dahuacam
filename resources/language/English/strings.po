@@ -1,0 +1,125 @@
+# Kodi Media Center language file
+# Addon Name: Dahua Cam Playback Addon
+# Addon id: script.dahuacam
+# Addon Provider: Paulemann
+msgid ""
+msgstr ""
+"Project-Id-Version: Kodi-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@kodi.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Paulemann\n"
+"Language-Team: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#32000"
+msgid "Camera Setup"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Name:"
+msgstr ""
+
+msgctxt "#32002"
+msgid "IP Address:"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Username:"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Password:"
+msgstr ""
+
+msgctxt "#33000"
+msgid "Dahua Cam Playback"
+msgstr ""
+
+msgctxt "#33001"
+msgid "File Type:"
+msgstr ""
+
+msgctxt "#33002"
+msgid "Calendar Month:"
+msgstr ""
+
+msgctxt "#33003"
+msgid "Calendar Year:"
+msgstr ""
+
+msgctxt "#33004"
+msgid "Items:"
+msgstr ""
+
+msgctxt "#33005"
+msgid "Start Time:"
+msgstr ""
+
+msgctxt "#33006"
+msgid "End Time:"
+msgstr ""
+
+msgctxt "#33007"
+msgid "File Size:"
+msgstr ""
+
+msgctxt "#33008"
+msgid "Status:"
+msgstr ""
+
+msgctxt "#33009"
+msgid "IP Address:"
+msgstr ""
+
+msgctxt "#33010"
+msgid "Close"
+msgstr ""
+
+msgctxt "#33011"
+msgid "Play"
+msgstr ""
+
+msgctxt "#33012"
+msgid "Save"
+msgstr ""
+
+msgctxt "#33013"
+msgid "{}% of {} MB in use"
+msgstr ""
+
+msgctxt "#33014"
+msgid "An error occured"
+msgstr ""
+
+msgctxt "#33020"
+msgid "Mo"
+msgstr ""
+
+msgctxt "#33021"
+msgid "Tu"
+msgstr ""
+
+msgctxt "#33022"
+msgid "We"
+msgstr ""
+
+msgctxt "#33023"
+msgid "Th"
+msgstr ""
+
+msgctxt "#33024"
+msgid "Fr"
+msgstr ""
+
+msgctxt "#33025"
+msgid "Sa"
+msgstr ""
+
+msgctxt "#33026"
+msgid "Su"
+msgstr ""
