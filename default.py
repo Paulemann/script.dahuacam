@@ -511,6 +511,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             self.list.selectItem(selected)
             self.setFocus(self.list)
             self.update_info()
+        else:
+            self.setFocus(self.button_cal[self.day + self.month_offset - 1])
 
         return
 
