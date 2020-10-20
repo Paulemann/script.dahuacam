@@ -46,6 +46,7 @@ dlgBtnPlay    = __localize__(33011)         # 'Abspielen'
 dlgBtnSave    = __localize__(33012)         # 'Sichern'
 dlgStatus     = __localize__(33013)         # '{}% von {} MB belegt'
 dlgError      = __localize__(33014)         # 'Ein Fehler is aufgetreten'
+dlgRecordType = __localize__(33015)         # 'Aufnahmetyp'
 dlgWeekDays   = [
                     __localize__(33020),
                     __localize__(33021),
@@ -67,10 +68,10 @@ cam_pwd   = None         # 'admin'
 if not xbmcvfs.exists(settings):
     xbmc.executebuiltin('Addon.OpenSettings(' + __addon_id__ + ')')
 
-cam_name  = __setting__('name')             # 'DoorCam'
-cam_ip    = __setting__('ipaddress')        # '10.10.30.6'
-cam_usr   = __setting__('username')         # 'admin'
-cam_pwd   = __setting__('password')         # 'admin'
+cam_name  = __setting__('name')
+cam_ip    = __setting__('ipaddress')
+cam_usr   = __setting__('username')
+cam_pwd   = __setting__('password')
 
 if not cam_name or not cam_ip:
     raise SystemExit
@@ -112,6 +113,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.type  = 'mp4'
 
         log('Addon started.')
+
         # placeControl(obj, row, column, rowspan=, columnspan=)
 
         label = pyxbmct.Label(dlgFileType, alignment=pyxbmct.ALIGN_LEFT)
@@ -162,8 +164,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         # Place the label on the window grid.
         self.placeControl(label, 1, 10, columnspan=3)
 
-        self.list = pyxbmct.List(_space=-1, _itemTextXOffset=-3, _alignmentY=0) #XBFONT_LEFT
-        self.placeControl(self.list, 2, 9, rowspan=10, columnspan=5)
+        label = pyxbmct.Label(dlgStartTime[:-1], font='font10', alignment=pyxbmct.ALIGN_CENTER)
+        self.placeControl(label, 2, 9, columnspan=2)
+
+        label = pyxbmct.Label(dlgRecordType[:-1], font='font10', alignment=pyxbmct.ALIGN_CENTER)
+        self.placeControl(label, 2, 11, columnspan=2)
+
+        self.list = pyxbmct.List(_space=-1, _itemTextXOffset=-3, _itemTextYOffset=-1, _alignmentY=0) #XBFONT_LEFT
+        self.placeControl(self.list, 3, 9, rowspan=10, columnspan=5)
         # Connect the list to a function to display which list item is selected.
         self.connect(self.list, self.update_info)
 
@@ -245,6 +253,12 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         # Connect a key action to a function.
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
 
+        log('Init done.')
+
+        return
+
+
+    def set_navigation(self):
         # Navigation
         #self.autoNavigation()
 
@@ -288,7 +302,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.list.controlLeft(self.radio_mp4)
         self.list.controlDown(self.button_play)
 
-        log('Init done.')
+        return
 
 
     def update_calendar(self):
@@ -305,13 +319,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         for row, week in enumerate(list(calendar.monthcalendar(self.year, self.month))):
             # week sequence is Mon, Tue, Wed, Thu, Fri, Sat, Sun
             for col, weekday in enumerate(week):
-                if row == weekday == 0:
+                if row == 0 and weekday == 0:
                     self.month_offset += 1
                 # weekday is actual day of month or zero
                 self.button_cal[row * 7 + col].setLabel(str(weekday), textColor=('0xFF7ACAFE' if weekday == self.day else '0xFFFFFFFF'))
                 self.button_cal[row * 7 + col].setEnabled(weekday > 0 and not (self.year == currentYear and self.month == currentMonth and weekday > currentDay))
                 self.button_cal[row * 7 + col].setVisible(weekday > 0)
 
+        self.set_navigation()
         self.update_list()
 
         return
@@ -495,15 +510,12 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         if self.list.size() > 0:
             self.list.selectItem(selected)
             self.setFocus(self.list)
-        else:
-            self.setFocus(self.button_close)
-
-        self.update_info(selected=selected)
+            self.update_info()
 
         return
 
 
-    def update_info(self, selected=None):
+    def update_info(self):
         if self.type == 'jpg':
             for key in self.label_info:
                 self.label_info[key].setVisible(False)
@@ -514,12 +526,11 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             self.image_preview.setVisible(False)
 
         if self.list.size() > 0:
-            item = self.items[selected or self.list.getSelectedPosition()]
+            item = self.items[self.list.getSelectedPosition()]
             if self.type == 'jpg':
                 # show preview of image in info section
                 tmpfile = self.download(item=item, destdir=tmpdir)
-                self.image_preview.setImage(tmpfile, False)
-
+                self.image_preview.setImage(tmpfile or '', False)
                 xbmc.sleep(500)
                 xbmcvfs.delete(tmpfile)
             else:
@@ -529,7 +540,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 self.label_info['FileSize'].setLabel('{} (KB)'.format(int(round(int(item['Length'])/1024.0, 0))))
         else:
             if self.type == 'jpg':
-                self.image_preview.setImage('')
+                self.image_preview.setImage('', False)
             else:
                 self.label_info['StartTime'].setLabel('')
                 self.label_info['EndTime'].setLabel('')
@@ -629,20 +640,26 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         if not name:
             name = '{}_{}_{}.{}'.format(self.camName, item['StartTime'].split()[0], item['StartTime'].split()[1].replace(':', '.'), path[-3:]).decode('utf-8')
 
-        outpath = os.path.join(destdir, name)
+        destfile = os.path.join(destdir, name)
 
         xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
         r = self.auth_get(cmd, self.camUsr, self.camPwd)
         if r.status_code == 200:
             #r.raw.decode_content = True
-            with open(outpath, 'wb') as out:
+            with open(destfile, 'wb') as out:
                 out.write(r.content)
                 #shutil.copyfileobj(r.raw, out)
+        else:
+            log('Failed downloading: {}'.format(destfile))
+            try:
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                log(e)
 
         xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
-        return outpath
+        return destfile if xbmcvfs.exists(destfile) else None
 
 
 # Create a window instance.

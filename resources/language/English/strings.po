@@ -96,6 +96,10 @@ msgctxt "#33014"
 msgid "An error occured"
 msgstr ""
 
+msgctxt "#33015"
+msgid "Record Type:"
+msgstr ""
+
 msgctxt "#33020"
 msgid "Mo"
 msgstr ""

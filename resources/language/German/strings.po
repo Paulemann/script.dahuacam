@@ -78,7 +78,7 @@ msgstr "IP-Adresse:"
 
 msgctxt "#33010"
 msgid "Close"
-msgstr "Beenden
+msgstr "Beenden"
 
 msgctxt "#33011"
 msgid "Play"
@@ -95,6 +95,10 @@ msgstr "{}% von {} MB belegt"
 msgctxt "#33014"
 msgid "An error occured"
 msgstr "Ein Fehler ist aufgetreten"
+
+msgctxt "#33015"
+msgid "Record Type:"
+msgstr "Aufnahmetyp:"
 
 msgctxt "#33020"
 msgid "Mo"
