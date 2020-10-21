@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.dahuacam"
    name="Dahua Cam Playback Addon"
-   version="0.7"
+   version="0.8"
    provider-name="Paulemann">
   <requires>
     <import addon="xbmc.python" version="2.26.0" />
@@ -16,6 +16,6 @@
     <summary lang="en">Addon to preview and download recordings from Dahua web cams.</summary>
     <description lang="en">Dahua cams allow the event or alert triggered capture of jpg snapshots and mp4 video sequences to local storage (SD card). This addon leverages Dahua cam API calls to access the recorded data from the kodi GUI. Stored jpg and mp4 files can be previewed and downloaded.</description>
     <summary lang="de">Addon zur Anzeige und zum Downlaod gespeicherter Aufnahmen von Dahua Web-Kameras.</summary>
-    <description lang="de">Dahua Web-Kameras erlauben die alarm- oder ereignisgesteuerte Speicheurng von jpg-Schnappschüssen und mp4-Videosequenzen auf dem lokalen Datenspeicher (SD-Karte). Dieses Addon nutzt die Dahua API, um über die kodi GUI auf die Aufnahmen zuzugreifen. Gespeicherte jpg oder mp4 Dateien können vorab betrachtet und heruntergeladen werden.</description>
+    <description lang="de">Dahua Web-Kameras erlauben die alarm- oder ereignisgesteuerte Speicherung von jpg-Schnappschüssen und mp4-Videosequenzen auf dem lokalen Datenspeicher (SD-Karte). Dieses Addon nutzt die Dahua API, um über die kodi GUI auf die Aufnahmen zuzugreifen. Gespeicherte jpg- oder mp4-Dateien können vorab betrachtet und heruntergeladen werden.</description>
   </extension>
 </addon>

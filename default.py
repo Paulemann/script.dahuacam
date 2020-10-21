@@ -78,6 +78,8 @@ if not cam_name or not cam_ip:
 
 tmpdir    = os.path.join(xbmc.translatePath(__profile__).decode('utf-8'), 'tmp') # '/home/kodi/tmp'
 
+ACTION_PLAY = 79
+
 
 def log(message,loglevel=xbmc.LOGNOTICE):
     xbmc.log(msg='[{}] {}'.format(__addon_id__, message), level=loglevel)
@@ -95,10 +97,22 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self._monitor = xbmc.Monitor()
         self._player  = xbmc.Player()
 
+        #self.cam = {} * MAXCAMS
+        #for i in range(MAXCAMS)
+        #self.cam[i]['name']     = name[i]
+        #self.cam[i]['ipaddr']   = ip[i]
+        #self.cam[i]['user']     = user[i]
+        #self.cam[i]['password'] = password[i]
+
         self.camName  = name
         self.camIP    = ip
         self.camUsr   = user
         self.camPwd   = password
+
+        #self.date = {}
+        #self.date['month'] = month
+        #self.date['year] = year
+        #self.date['day'] = day
 
         self.month = datetime.now().month
         self.year  = datetime.now().year
@@ -252,6 +266,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         # Connect a key action to a function.
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
+        self.connect(ACTION_PLAY, self.play)
 
         log('Init done.')
 
@@ -330,6 +345,12 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.update_list()
 
         return
+
+
+    #def onAction(self, action):
+    #    log('Action: {}'.format(action.getId()))
+    #    if action == ACTION_PLAY:
+    #        self.play()
 
 
     def auth_get(self, url, *args, **kwargs):
@@ -599,6 +620,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def play(self, item=None):
+        if self.type == 'jpg' or  self.list.getSelectedPosition() < 0: # self.list.size() == 0
+            return
+
         if not item:
             item = self.items[self.list.getSelectedPosition()]
 
@@ -624,6 +648,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def download(self, item=None, destdir=None, name=None):
+        if self.list.getSelectedPosition() < 0: # self.list.size() == 0
+            return
+
         if not item:
             item = self.items[self.list.getSelectedPosition()]
 
