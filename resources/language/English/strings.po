@@ -69,35 +69,43 @@ msgid "File Size:"
 msgstr ""
 
 msgctxt "#33008"
-msgid "Status:"
+msgid "Error Status:"
 msgstr ""
 
 msgctxt "#33009"
-msgid "IP Address:"
+msgid "SD Card:"
 msgstr ""
 
 msgctxt "#33010"
-msgid "Close"
+msgid "IP Address:"
 msgstr ""
 
 msgctxt "#33011"
-msgid "Play"
+msgid "Close"
 msgstr ""
 
 msgctxt "#33012"
-msgid "Save"
+msgid "Play"
 msgstr ""
 
 msgctxt "#33013"
-msgid "{}% of {} MB in use"
+msgid "Save"
 msgstr ""
 
 msgctxt "#33014"
-msgid "An error occured"
+msgid "{}% of {} MB in use"
 msgstr ""
 
 msgctxt "#33015"
+msgid "An error occured"
+msgstr ""
+
+msgctxt "#33016"
 msgid "Record Type:"
+msgstr ""
+
+msgctxt "#33017"
+msgid "Press 'Play' to start video:"
 msgstr ""
 
 msgctxt "#33020"

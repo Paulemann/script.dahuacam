@@ -69,36 +69,44 @@ msgid "File Size:"
 msgstr "Dateigröße:"
 
 msgctxt "#33008"
-msgid "Status:"
-msgstr "Status:"
+msgid "Error Status:"
+msgstr "Fehlerstatus:"
 
 msgctxt "#33009"
+msgid "SD Card:"
+msgstr "SD-Karte:"
+
+msgctxt "#33010"
 msgid "IP Address:"
 msgstr "IP-Adresse:"
 
-msgctxt "#33010"
+msgctxt "#33011"
 msgid "Close"
 msgstr "Beenden"
 
-msgctxt "#33011"
+msgctxt "#33012"
 msgid "Play"
 msgstr "Abspielen"
 
-msgctxt "#33012"
+msgctxt "#33013"
 msgid "Save"
 msgstr "Sichern"
 
-msgctxt "#33013"
+msgctxt "#33014"
 msgid "{}% of {} MB in use"
 msgstr "{}% von {} MB belegt"
 
-msgctxt "#33014"
+msgctxt "#33015"
 msgid "An error occured"
 msgstr "Ein Fehler ist aufgetreten"
 
-msgctxt "#33015"
+msgctxt "#33016"
 msgid "Record Type:"
 msgstr "Aufnahmetyp:"
+
+msgctxt "#33017"
+msgid "Press 'Play' to start video"
+msgstr "'Play' drücken, um Video zu starten"
 
 msgctxt "#33020"
 msgid "Mo"
