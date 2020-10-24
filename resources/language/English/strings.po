@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "#32000"
-msgid "Camera Setup"
+msgid "Camera 1"
 msgstr ""
 
 msgctxt "#32001"
@@ -34,6 +34,18 @@ msgstr ""
 
 msgctxt "#32004"
 msgid "Password:"
+msgstr ""
+
+sgctxt "#32010"
+msgid "Camera 2"
+msgstr ""
+
+sgctxt "#32020"
+msgid "Camera 3"
+msgstr ""
+
+sgctxt "#32030"
+msgid "Camera 4"
 msgstr ""
 
 msgctxt "#33000"

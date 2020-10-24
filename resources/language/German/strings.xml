@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-  <string id="32000">Camera Setup</string>
+  <string id="32000">Kamera 1</string>
   <string id="32001">Name:</string>
   <string id="32002">IP-Adresse:</string>
   <string id="32003">Benutzer:</string>
   <string id="32004">Passwort:</string>
+  <string id="32010">Kamera 2</string>
+  <string id="32020">Kamera 3</string>
+  <string id="32030">Kamera 4</string>
   <string id="33000">Dahua Cam Playback</string>
   <string id="33001">Dateityp:</string>
   <string id="33002">Kalendermonat:</string>

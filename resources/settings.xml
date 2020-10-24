@@ -3,7 +3,25 @@
     <category label="32000">
         <setting label="32001" type="text" id="name" default="" />
         <setting label="32002" type="text" id="ipaddress" default="" />
-        <setting label="32003" type="text" id="username" option="hidden" default="" enable="!eq(-1,)" />
+        <setting label="32003" type="text" id="username" default="" enable="!eq(-1,)" />
         <setting label="32004" type="text" id="password" option="hidden" default="" enable="!eq(-1,)" />
+    </category>
+    <category label="32010">
+        <setting label="32001" type="text" id="name2" default="" />
+        <setting label="32002" type="text" id="ipaddress2" default="" />
+        <setting label="32003" type="text" id="username2" default="" enable="!eq(-1,)" />
+        <setting label="32004" type="text" id="password2" option="hidden" default="" enable="!eq(-1,)" />
+    </category>
+    <category label="32020">
+        <setting label="32001" type="text" id="name3" default="" />
+        <setting label="32002" type="text" id="ipaddress3" default="" />
+        <setting label="32003" type="text" id="username3" default="" enable="!eq(-1,)" />
+        <setting label="32004" type="text" id="password3" option="hidden" default="" enable="!eq(-1,)" />
+    </category>
+    <category label="32030">
+        <setting label="32001" type="text" id="name4" default="" />
+        <setting label="32002" type="text" id="ipaddress4" default="" />
+        <setting label="32003" type="text" id="username4" default="" enable="!eq(-1,)" />
+        <setting label="32004" type="text" id="password4" option="hidden" default="" enable="!eq(-1,)" />
     </category>
 </settings>

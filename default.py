@@ -100,12 +100,19 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self._monitor = xbmc.Monitor()
         self._player  = xbmc.Player()
 
+        self.cams = []
+
         self.cam = {
             'Name':     name,
             'IPAddr':   ip,
             'User':     user,
             'Password': password
             }
+
+        self.cams.append(self.cam)
+        self.active_cam = 0
+
+        self.button_cam = []
 
         self.date = {
             'Day':      datetime.now().day,
@@ -116,7 +123,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.month_offset = 0
 
         self.label_info   = {}
-        self.label_status = {}
+        self.label_system = {}
         self.button_cal   = []
 
         self.items = []
@@ -131,11 +138,11 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         self.radio_jpg = pyxbmct.RadioButton('jpg')
         self.placeControl(self.radio_jpg, 1, 4, columnspan=2)
-        self.connect(self.radio_jpg, self.update_radio('jpg'))
+        self.connect(self.radio_jpg, self.set_type('jpg'))
 
         self.radio_mp4 = pyxbmct.RadioButton('mp4')
         self.placeControl(self.radio_mp4, 1, 6, columnspan=2)
-        self.connect(self.radio_mp4, self.update_radio('mp4'))
+        self.connect(self.radio_mp4, self.set_type('mp4'))
 
         self.radio_mp4.setSelected(True)
 
@@ -145,14 +152,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         self.button_mprev = pyxbmct.Button('<')
         self.placeControl(self.button_mprev, 4, 1)
-        self.connect(self.button_mprev, self.update_calmonth('-')) # self.month_prev)
+        self.connect(self.button_mprev, self.set_month('-')) # self.month_prev)
 
         self.label_month = pyxbmct.Label(str(self.date['Month']), alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.label_month, 4, 2)
 
         self.button_mnext = pyxbmct.Button('>')
         self.placeControl(self.button_mnext, 4, 3)
-        self.connect(self.button_mnext, self.update_calmonth('+')) # self.month_next)
+        self.connect(self.button_mnext, self.set_month('+')) # self.month_next)
 
         # Create a text label.
         label = pyxbmct.Label(dlgCalYear, alignment=pyxbmct.ALIGN_CENTER)
@@ -160,14 +167,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         self.button_yprev = pyxbmct.Button('<')
         self.placeControl(self.button_yprev, 4, 5)
-        self.connect(self.button_yprev, self.update_calyear('-')) # self.year_prev)
+        self.connect(self.button_yprev, self.set_year('-')) # self.year_prev)
 
         self.label_year = pyxbmct.Label(str(self.date['Year']), alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.label_year, 4, 6)
 
         self.button_ynext = pyxbmct.Button('>')
         self.placeControl(self.button_ynext, 4, 7)
-        self.connect(self.button_ynext, self.update_calyear('+')) # self.year_next)
+        self.connect(self.button_ynext, self.set_year('+')) # self.year_next)
 
         # Create a text label.
         label = pyxbmct.Label(dlgItems, alignment=pyxbmct.ALIGN_CENTER)
@@ -218,45 +225,41 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             for col in range(7):
                 button_cal = pyxbmct.Button('')
                 self.placeControl(button_cal, 6 + row, 1 + col)
-                self.connect(button_cal, self.update_calday(row * 7 + col))
+                self.connect(button_cal, self.set_day(row * 7 + col))
                 self.button_cal.append(button_cal)
 
-        self.label_status['txtErrState'] = pyxbmct.Label(dlgErrState, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
-        self.placeControl(self.label_status['txtErrState'], 12, 1, columnspan=2)
+        self.label_system['txtErrState'] = pyxbmct.Label(dlgErrState, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.placeControl(self.label_system['txtErrState'], 12, 1, columnspan=2)
 
-        self.label_status['ErrState'] = pyxbmct.Label('', font='font10', textColor='0xFFFF0000', alignment=pyxbmct.ALIGN_LEFT)
-        self.placeControl(self.label_status['ErrState'], 12, 3, columnspan=5)
+        self.label_system['ErrState'] = pyxbmct.Label('', font='font10', textColor='0xFFFF0000', alignment=pyxbmct.ALIGN_LEFT)
+        self.placeControl(self.label_system['ErrState'], 12, 3, columnspan=5)
 
-        try:
-            (path, totalMB, used) = self.status()
-            status = dlgStatus.format(used, totalMB)
-        except:
-            status = dlgError
+        self.label_system['txtLocStore'] = pyxbmct.Label(dlgLocStore, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.placeControl(self.label_system['txtLocStore'], 13, 1, columnspan=2)
 
-        self.label_status['txtLocStore'] = pyxbmct.Label(dlgLocStore, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
-        self.placeControl(self.label_status['txtLocStore'], 13, 1, columnspan=2)
+        self.label_system['LocStore'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.placeControl(self.label_system['LocStore'], 13, 3, columnspan=5)
 
-        self.label_status['LocStore'] = pyxbmct.Label(status, font='font10', alignment=pyxbmct.ALIGN_LEFT)
-        self.placeControl(self.label_status['LocStore'], 13, 3, columnspan=5)
+        self.label_system['txtHWInfo'] = pyxbmct.Label(dlgHWInfo, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.placeControl(self.label_system['txtHWInfo'], 14, 1, columnspan=2)
 
-        try:
-            (deviceType, serialNumber, hardwareVersion) = self.system_info()
-            sysInfo = '{} ({})'.format(deviceType, serialNumber)
-        except:
-            sysInfo = dlgError
-
-        self.label_status['txtHWInfo'] = pyxbmct.Label(dlgHWInfo, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
-        self.placeControl(self.label_status['txtHWInfo'], 14, 1, columnspan=2)
-
-        #self.label_status['HWInfo'] = pyxbmct.Label('{} ({})'.format(self.cam['IPAddr'], self.cam['Name']), font='font10', alignment=pyxbmct.ALIGN_LEFT)
-        self.label_status['HWInfo'] = pyxbmct.Label(sysInfo, font='font10', alignment=pyxbmct.ALIGN_LEFT)
-        self.placeControl(self.label_status['HWInfo'], 14, 3, columnspan=5)
+        self.label_system['HWInfo'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.placeControl(self.label_system['HWInfo'], 14, 3, columnspan=5)
 
         # Create the 'Close' button.
         self.button_close = pyxbmct.Button(dlgBtnClose)
         self.placeControl(self.button_close, 16, 1, columnspan=2)
         #self.setFocus(self.button_close)
         self.connect(self.button_close, self.close)
+
+        for i in range(4):
+            button_cam = pyxbmct.Button(str(i + 1), textColor='0xFF7ACAFE' if i == self.active_cam else '0xFFFFFFFF')
+            self.placeControl(button_cam, 16, 4 + i)
+            self.connect(button_cam, self.set_cam(i))
+            button_cam.setEnabled(True if i < len(self.cams) else False)
+            self.button_cam.append(button_cam)
+
+        self.update_system()
 
         tid = self.label_total.getId()
 
@@ -279,6 +282,19 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.connect(ACTION_PLAY, self.play)
 
         log('Addon initialization done.')
+
+        return
+
+
+    def add_cam(self, name, ip, user, password):
+        cam = {
+            'Name':     name,
+            'IPAddr':   ip,
+            'User':     user,
+            'Password': password
+            }
+        self.cams.append(cam)
+        self.button_cam[len(self.cams) - 1].setEnabled(True)
 
         return
 
@@ -318,14 +334,42 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.button_ynext.controlLeft(self.button_yprev)
         self.button_ynext.controlRight(self.list)
         self.button_close.controlUp(self.button_cal[self.date['Day']  + self.month_offset - 1])
-        self.button_close.controlRight(self.button_play)
+        self.button_close.controlRight(self.button_cam[0])
+
+        for i in range(4):
+            self.button_cam[i].controlUp(self.button_cal[self.date['Day']  + self.month_offset - 1])
+            self.button_cam[i].controlLeft(self.button_cam[i - 1] if i > 0 else self.button_close)
+            self.button_cam[i].controlRight(self.button_cam[i + 1] if i < 3 else self.button_play)
+
         self.button_play.controlUp(self.list)
-        self.button_play.controlLeft(self.button_close)
+        self.button_play.controlLeft(self.button_cam[3])
         self.button_play.controlRight(self.button_dnld)
         self.button_dnld.controlUp(self.list)
         self.button_dnld.controlLeft(self.button_play)
         self.list.controlLeft(self.radio_mp4)
         self.list.controlDown(self.button_play)
+
+        return
+
+
+    def update_system(self):
+        for i in range(4):
+            self.button_cam[i].setLabel(str(i + 1), textColor='0xFF7ACAFE' if i == self.active_cam else '0xFFFFFFFF')
+            self.button_cam[i].setEnabled(True if i < len(self.cams) else False)
+
+        try:
+            (path, totalMB, used) = self.system_status()
+            status = dlgStatus.format(used, totalMB)
+        except:
+            status = dlgError
+        self.label_system['LocStore'].setLabel(status) #, font='font10', alignment=pyxbmct.ALIGN_LEFT)
+
+        try:
+            (deviceType, serialNumber, hardwareVersion) = self.system_info()
+            sysInfo = '{} ({})'.format(deviceType, self.cam['Name'])
+        except:
+            sysInfo = dlgError
+        self.label_system['HWInfo'].setLabel(sysInfo) #, font='font10', alignment=pyxbmct.ALIGN_LEFT)
 
         return
 
@@ -380,7 +424,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         return r
 
 
-    def status(self):
+    def system_status(self):
         r = self.auth_get('http://{}/cgi-bin/storageDevice.cgi?action=getDeviceAllInfo'.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
 
         if r.status_code == 200:
@@ -396,14 +440,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                     UsedBytes = float(line.split('=')[1])
                 elif 'IsError' in line:
                     IsError = bool(line.split('=')[1].strip().lower() == 'true')
-            self.label_status['ErrState'].setLabel('')
+            self.label_system['ErrState'].setLabel('')
         else:
             log('Failed retrieving storage info from camera.')
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as e:
                 log(e)
-                self.label_status['ErrState'].setLabel('{}'.format(e))
+                self.label_system['ErrState'].setLabel('{}'.format(e))
             return None
 
         Used = round((UsedBytes / TotalBytes) * 100.0, 1)
@@ -432,13 +476,24 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 r.raise_for_status()
             except requests.exceptions.HTTPError as e:
                 log(e)
-                self.label_status['ErrState'].setLabel('{}'.format(e))
+                self.label_system['ErrState'].setLabel('{}'.format(e))
             return None
 
         return (deviceType, serialNumber, hardwareVersion)
 
 
-    def update_radio(self, type):
+    def set_cam(self, index):
+        def update_cam():
+            self.cam = self.cams[index]
+            self.active_cam = index
+
+            self.update_system()
+            self.update_list()
+
+        return update_cam
+
+
+    def set_type(self, type):
         def update_type():
             if type == 'jpg':
                 if not self.radio_jpg.isSelected():
@@ -458,7 +513,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         return update_type
 
 
-    def update_calyear(self, dir='+'):
+    def set_year(self, dir='+'):
         def update_year():
             if dir =='+':
                 currentYear   = datetime.now().year
@@ -481,7 +536,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         return update_year
 
 
-    def update_calmonth(self, dir='+'):
+    def set_month(self, dir='+'):
         def update_month():
             if dir == '+':
                 currentYear   = datetime.now().year
@@ -502,7 +557,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         return update_month
 
 
-    def update_calday(self, index):
+    def set_day(self, index):
         def update_day():
             self.date['Day'] = int(self.button_cal[index].getLabel())
             self.update_calendar()
@@ -598,7 +653,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                         if 'error' in data[0]:
                             json_data = json.loads(data[0])
                             log('Error retrieving item list: {}'.format(json_data['error']['message']))
-                            self.label_status['ErrState'].setLabel('{}'.format(json_data['error']['message']))
+                            self.label_system['ErrState'].setLabel('{}'.format(json_data['error']['message']))
                         continue
 
                     if numitems == 0:
@@ -613,14 +668,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                         if len(item) == numkeys:
                             items.append(item)
                             item = {}
-                    self.label_status['ErrState'].setLabel('')
+                    self.label_system['ErrState'].setLabel('')
                 else:
                     log('Failed retrieving item list.')
                     try:
                         r.raise_for_status()
                     except requests.exceptions.HTTPError as e:
                         log(e)
-                        self.label_status['ErrState'].setLabel('{}'.format(e))
+                        self.label_system['ErrState'].setLabel('{}'.format(e))
                     break
 
                 xbmc.sleep(1000)
@@ -766,14 +821,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             with open(destfile, 'wb') as out:
                 out.write(r.content)
                 #shutil.copyfileobj(r.raw, out)
-            self.label_status['ErrState'].setLabel('')
+            self.label_system['ErrState'].setLabel('')
         else:
             log('Failed downloading: {}'.format(destfile))
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as e:
                 log(e)
-                self.label_status['ErrState'].setLabel('{}'.format(e))
+                self.label_system['ErrState'].setLabel('{}'.format(e))
 
         xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
@@ -782,6 +837,16 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 # Create a window instance.
 window = DahuaCamPlayback(cam_name, cam_ip, cam_usr, cam_pwd)
+for i in range(2, 5):
+    cam_name  = None
+    cam_ip    = None
+    cam_name  = __setting__('name' + str(i))
+    cam_ip    = __setting__('ipaddress' + str(i))
+    cam_usr   = __setting__('username' + str(i))
+    cam_pwd   = __setting__('password' + str(i))
+    if cam_name and cam_ip:
+        window.add_cam(cam_name, cam_ip, cam_usr, cam_pwd)
+
 # Show the created window.
 window.doModal()
 # Delete the window instance when it is no longer used.
