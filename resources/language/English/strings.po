@@ -36,15 +36,15 @@ msgctxt "#32004"
 msgid "Password:"
 msgstr ""
 
-sgctxt "#32010"
+msgctxt "#32010"
 msgid "Camera 2"
 msgstr ""
 
-sgctxt "#32020"
+msgctxt "#32020"
 msgid "Camera 3"
 msgstr ""
 
-sgctxt "#32030"
+msgctxt "#32030"
 msgid "Camera 4"
 msgstr ""
 
