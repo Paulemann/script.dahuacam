@@ -77,8 +77,8 @@ msgid "SD Card:"
 msgstr "SD-Karte:"
 
 msgctxt "#33010"
-msgid "IP Address:"
-msgstr "IP-Adresse:"
+msgid "HW Info:"
+msgstr "HW-Info:"
 
 msgctxt "#33011"
 msgid "Close"

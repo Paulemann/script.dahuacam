@@ -77,7 +77,7 @@ msgid "SD Card:"
 msgstr ""
 
 msgctxt "#33010"
-msgid "IP Address:"
+msgid "HW Info:"
 msgstr ""
 
 msgctxt "#33011"
