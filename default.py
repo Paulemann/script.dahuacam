@@ -89,6 +89,43 @@ def log(message,loglevel=xbmc.LOGNOTICE):
 
 
 class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
+    BLUE  = '0xFF7ACAFE'
+    RED   =' 0xFFFF0000'
+    WHITE = '0xFFFFFFFF'
+    GREY  = '0xAAFFFFFF'
+
+    MEDIA_FINDER_CREATE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=factory.create'
+    MEDIA_FINDER_FINDFILE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findFile&object={} \
+        &condition.Channel={}&condition.StartTime={}&condition.EndTime={} \
+        &condition.Types[0]={}'
+        # http://<server>/cgi-bin/mediaFileFind.cgi?action=findFile
+        #    &object=<objectId>
+        #    &condition.Channel=<ChannelNo>
+        #    &condition.StartTime=<start>
+        #    &condition.EndTime=<end>
+        # Optional:
+        #    &condition.Dirs[0]=<dir>
+        #    &condition.Types[0]=<type>
+        #    &condition.Flag[0]=<flag>
+        #    &condition.Events[0]=<event>
+        #    &condition.VideoStream= <stream>
+        # Input Arguments:
+        #   objectId = objectId created from mediaFileFinder
+        #   channel  = 1, ...
+        #   start    = 'YYYY-MM-DD HH:MM:SS'
+        #   end      = 'YYYY-MM-DD HH:MM:SS'
+        # Optional Arguments:
+        #   type     = ('dav', 'jpg', 'mp4')
+        #   dir      = ('/mnt/dvr/sda0', '/mnt/dvr/sda1')
+        #   flag     = ('Timing', 'Manual', 'Marker', 'Event', 'Mosaic', 'Cutout')
+        #   event    = ('AlarmLocal', 'VideoMotion', 'VideoLoss', 'VideoBlind', 'Traffic*')
+        #   stream   = ('Main', 'Extra1', 'Extra2', 'Extra3')
+    MEDIA_FINDER_FINDNEXT = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findNextFile&object={}&count={}'
+    MEDIA_FINDER_CLOSE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=close&object={}'
+    MEDIA_FINDER_DESTROY = 'http://{}/cgi-bin/mediaFileFind.cgi?action=destroy&object={}'
+    STORAGE_INFO = 'http://{}/cgi-bin/storageDevice.cgi?action=getDeviceAllInfo'
+    SYSTEM_INFO = 'http://{}/cgi-bin/magicBox.cgi?action=getSystemInfo'
+    LOADFILE = 'http://{}/cgi-bin/RPC_Loadfile{}'
 
     def __init__(self, name, ip, user, password):
         # You need to call base class' constructor.
@@ -181,10 +218,10 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         # Place the label on the window grid.
         self.placeControl(label, 1, 10, columnspan=3)
 
-        label = pyxbmct.Label(dlgStartTime[:-1], font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_CENTER)
+        label = pyxbmct.Label(dlgStartTime[:-1], font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(label, 2, 9, columnspan=2)
 
-        label = pyxbmct.Label(dlgRecordType[:-1], font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_CENTER)
+        label = pyxbmct.Label(dlgRecordType[:-1], font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(label, 2, 11, columnspan=2)
 
         self.list = pyxbmct.List(_space=-1, _itemTextXOffset=-3, _itemTextYOffset=-1, _alignmentY=0) #XBFONT_LEFT
@@ -199,26 +236,26 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.placeControl(self.image_preview, 12, 9, rowspan=3, columnspan=5)
         self.image_preview.setVisible(False)
 
-        self.label_info['txtStartTime'] = pyxbmct.Label(dlgStartTime, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['txtStartTime'] = pyxbmct.Label(dlgStartTime, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['txtStartTime'], 12, 9, columnspan=2)
 
-        self.label_info['StartTime'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['StartTime'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['StartTime'], 12, 11, columnspan=3)
 
-        self.label_info['txtEndTime'] = pyxbmct.Label(dlgEndTime, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['txtEndTime'] = pyxbmct.Label(dlgEndTime, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['txtEndTime'], 13, 9, columnspan=2)
 
-        self.label_info['EndTime'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['EndTime'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['EndTime'], 13, 11, columnspan=3)
 
-        self.label_info['txtFileSize'] = pyxbmct.Label(dlgFileSize, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['txtFileSize'] = pyxbmct.Label(dlgFileSize, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['txtFileSize'], 14, 9, columnspan=2)
 
-        self.label_info['FileSize'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['FileSize'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['FileSize'], 14, 11, columnspan=3)
 
         for col, day in enumerate(dlgWeekDays):
-            label = pyxbmct.Label(day, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_CENTER)
+            label = pyxbmct.Label(day, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_CENTER)
             self.placeControl(label, 5, 1 + col)
 
         for row in range(6):
@@ -228,22 +265,22 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 self.connect(button_cal, self.set_day(row * 7 + col))
                 self.button_cal.append(button_cal)
 
-        self.label_system['txtErrState'] = pyxbmct.Label(dlgErrState, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_system['txtErrState'] = pyxbmct.Label(dlgErrState, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_system['txtErrState'], 12, 1, columnspan=2)
 
-        self.label_system['ErrState'] = pyxbmct.Label('', font='font10', textColor='0xFFFF0000', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_system['ErrState'] = pyxbmct.Label('', font='font10', textColor=self.RED, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_system['ErrState'], 12, 3, columnspan=5)
 
-        self.label_system['txtLocStore'] = pyxbmct.Label(dlgLocStore, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_system['txtLocStore'] = pyxbmct.Label(dlgLocStore, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_system['txtLocStore'], 13, 1, columnspan=2)
 
-        self.label_system['LocStore'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_system['LocStore'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_system['LocStore'], 13, 3, columnspan=5)
 
-        self.label_system['txtHWInfo'] = pyxbmct.Label(dlgHWInfo, font='font10', textColor='0xFF7ACAFE', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_system['txtHWInfo'] = pyxbmct.Label(dlgHWInfo, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_system['txtHWInfo'], 14, 1, columnspan=2)
 
-        self.label_system['HWInfo'] = pyxbmct.Label('', font='font10', alignment=pyxbmct.ALIGN_LEFT)
+        self.label_system['HWInfo'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_system['HWInfo'], 14, 3, columnspan=5)
 
         # Create the 'Close' button.
@@ -253,7 +290,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.connect(self.button_close, self.close)
 
         for i in range(4):
-            button_cam = pyxbmct.Button(str(i + 1), textColor='0xFF7ACAFE' if i == self.active_cam else '0xFFFFFFFF')
+            button_cam = pyxbmct.Button(str(i + 1), textColor=self.BLUE if i == self.active_cam else self.WHITE)
             self.placeControl(button_cam, 16, 4 + i)
             self.connect(button_cam, self.set_cam(i))
             button_cam.setEnabled(True if i < len(self.cams) else False)
@@ -354,7 +391,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
     def update_system(self):
         for i in range(4):
-            self.button_cam[i].setLabel(str(i + 1), textColor='0xFF7ACAFE' if i == self.active_cam else '0xFFFFFFFF')
+            self.button_cam[i].setLabel(str(i + 1), textColor=self.BLUE if i == self.active_cam else self.WHITE)
             self.button_cam[i].setEnabled(True if i < len(self.cams) else False)
 
         try:
@@ -391,7 +428,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 if row == 0 and weekday == 0:
                     self.month_offset += 1
                 # weekday is actual day of month or zero
-                self.button_cal[row * 7 + col].setLabel(str(weekday), textColor=('0xFF7ACAFE' if weekday == self.date['Day']  else '0xFFFFFFFF'))
+                self.button_cal[row * 7 + col].setLabel(str(weekday), textColor=(self.BLUE if weekday == self.date['Day']  else self.WHITE))
                 self.button_cal[row * 7 + col].setEnabled(weekday > 0 and not (self.date['Year']  == currentYear and self.date['Month']  == currentMonth and weekday > currentDay))
                 self.button_cal[row * 7 + col].setVisible(weekday > 0)
 
@@ -402,6 +439,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def auth_get(self, url, *args, **kwargs):
+        # Dahua cams use Digest Authentication scheme
+        return requests.get(url, stream=True, auth=HTTPDigestAuth(*args), **kwargs)
+
         # Auth Scheme Mapping for Requets
         AUTH_MAP = {
             'basic': HTTPBasicAuth,
@@ -425,7 +465,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def system_status(self):
-        r = self.auth_get('http://{}/cgi-bin/storageDevice.cgi?action=getDeviceAllInfo'.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
+        r = self.auth_get(self.STORAGE_INFO.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
 
         if r.status_code == 200:
             data = r.text.split('\r\n')
@@ -459,7 +499,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def system_info(self):
-        r = self.auth_get('http://{}/cgi-bin/magicBox.cgi?action=getSystemInfo'.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
+        r = self.auth_get(self.SYSTEM_INFO.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
 
         if r.status_code == 200:
             data = r.text.split('\r\n')
@@ -586,68 +626,37 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
         # Create a mediaFileFinder
-        r = self.auth_get('http://{}/cgi-bin/mediaFileFind.cgi?action=factory.create' \
-                .format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
+        r = self.auth_get(self.MEDIA_FINDER_CREATE.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
         if r.status_code == 200:
             data = r.text.split('\r\n')
             objectId = data[0].split('=')[1]
 
             # Start findFile
-            # http://<server>/cgi-bin/mediaFileFind.cgi?action=findFile
-            #    &object=<objectId>
-            #    &condition.Channel=<ChannelNo>
-            #    &condition.StartTime=<start>
-            #    &condition.EndTime=<end>
-            #    [&condition.Dirs[0]=<dir>
-            #    &condition.Types[0]=<type>
-            #    &condition.Flag[0]=<flag>
-            #    &condition.Events[0]=<event>
-            #    &condition.VideoStream= <stream>]
-            # http://<server>/cgi-bin/mediaFileFind.cgi?action=findNextFile
-            #    &object=<objectId>
-            #    &count=<fileCount>
-            # Input Arguments:
-            #   objectId = objectId created from mediaFileFinder
-            #   channel  = 1, ...
-            #   start    = 'YYYY-MM-DD HH:MM:SS'
-            #   end      = 'YYYY-MM-DD HH:MM:SS'
-            #   type     = ('dav', 'jpg', 'mp4')
-            # Optional Arguments:
-            #   dir      = ('/mnt/dvr/sda0', '/mnt/dvr/sda1')
-            #   flag     = ('Timing', 'Manual', 'Marker', 'Event', 'Mosaic', 'Cutout')
-            #   event    = ('AlarmLocal', 'VideoMotion', 'VideoLoss', 'VideoBlind', 'Traffic*')
-            #   stream   = ('Main', 'Extra1', 'Extra2', 'Extra3')
-
-            # Fields in Response:
-            #   found         Count of found file, found is 0 if no file is found.
-            #   Channel       Channel, equals to API findFile input condition.Channel -1
-            #   StartTime     Start Time
-            #   EndTime       End time
-            #   Type          File type
-            #   Events        Event type
-            #   VideoStream   Video Stream type
-            #   FilePath      File path
-            #   Length        File length
-            #   Duration      Duration time
-
-            r = self.auth_get('http://{}/cgi-bin/mediaFileFind.cgi?action=findFile \
-                    &object={}&condition.Channel={}&condition.StartTime={} \
-                    &condition.EndTime={}&condition.Types[0]={}' \
-                    .format(self.cam['IPAddr'], objectId, channel,
-                    start_date, end_date, self.type),
+            r = self.auth_get(self.MEDIA_FINDER_FINDFILE.format(self.cam['IPAddr'],
+                    objectId, channel,start_date, end_date, self.type),
                     self.cam['User'], self.cam['Password'])
             success = (r.text == 'OK\r\n')
 
             # findNextFile
             while success:
-                r = self.auth_get('http://{}/cgi-bin/mediaFileFind.cgi?action=findNextFile \
-                        &object={}&count={}' \
-                        .format(self.cam['IPAddr'], objectId, count),
-                        self.cam['User'], self.cam['Password'])
+                r = self.auth_get(self.MEDIA_FINDER_FINDNEXT.format(self.cam['IPAddr'],
+                        objectId, count), self.cam['User'], self.cam['Password'])
                 if r.status_code == 200:
+                    # Fields in Response:
+                    #   found                  Count of found file, found is 0 if no file is found.
+                    #   items[i].Channel       Channel, equals to API findFile input condition.Channel -1
+                    #   items[i].StartTime     Start Time (YYYY-MM-DD HH:MM:SS)
+                    #   items[i].EndTime       End time (YYYY-MM-DD HH:MM:SS)
+                    #   items[i].Type          File type ('dav', 'jpg', 'mp4')
+                    #   items[i].Flags[0]      Flag ('Timing', 'Manual', 'Marker', 'Event', 'Mosaic', 'Cutout')
+                    #   items[i].Events[0]     Event type ('AlarmLocal', 'VideoMotion', 'VideoLoss', 'VideoBlind', 'Traffic*')
+                    #   items[i].FilePath      File path
+                    #   items[i].Length        File length
+                    #   items[i].Duration      Duration time
                     data = r.text.split('\r\n')
-                    if '=' in data[0]:
+                    if 'found=' in data[0]:
                         numitems = int(data[0].split('=')[1])
+                        self.label_system['ErrState'].setLabel('')
                     else:
                         # data[0] = {"error":{"code":287637505,"message":"Invalid session in request data!"},"result":false}
                         if 'error' in data[0]:
@@ -660,7 +669,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                         break
 
                     # Ignore first and last line for calculation of item length
-                    numkeys = int((len(data) - 2) / numitems)
+                    numkeys = int((len(data) - 2) / numitems) # numkeys = int(len(data[1:-1]) / numitems)
 
                     item = {}
                     for line in data[1:-1]:
@@ -668,7 +677,6 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                         if len(item) == numkeys:
                             items.append(item)
                             item = {}
-                    self.label_system['ErrState'].setLabel('')
                 else:
                     log('Failed retrieving item list.')
                     try:
@@ -684,12 +692,10 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 log('No items.')
 
             # Close and destroy the mediaFileFinder
-            r = self.auth_get('http://{}/cgi-bin/mediaFileFind.cgi?action=close \
-                    &object={}'.format(self.cam['IPAddr'], objectId),
-                    self.cam['User'], self.cam['Password'])
-            r = self.auth_get('http://{}/cgi-bin/mediaFileFind.cgi?action=destroy \
-                    &object={}'.format(self.cam['IPAddr'], objectId),
-                    self.cam['User'], self.cam['Password'])
+            r = self.auth_get(self.MEDIA_FINDER_CLOSE.format(self.cam['IPAddr'],
+                    objectId), self.cam['User'], self.cam['Password'])
+            r = self.auth_get(self.MEDIA_FINDER_DESTROY.format(self.cam['IPAddr'],
+                    objectId), self.cam['User'], self.cam['Password'])
 
         xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
@@ -803,7 +809,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             xbmcvfs.mkdir(destdir)
 
         path = item['FilePath']
-        cmd = 'http://{}/cgi-bin/RPC_Loadfile{}'.format(self.cam['IPAddr'], path)
+        cmd = self.LOADFILE.format(self.cam['IPAddr'], path)
 
         # item['FilePath'] = e.g. /mnt/sd/2019-11-11/001/dav/21/21.40.47-21.41.33[M][0@0][0].mp4
         # item['FilePath'] = e.g. /mnt/sd/2020-10-11/001/jpg/21/09/14[M][0@0][0].jpg
@@ -838,10 +844,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 # Create a window instance.
 window = DahuaCamPlayback(cam_name, cam_ip, cam_usr, cam_pwd)
 for i in range(2, 5):
-    cam_name  = None
-    cam_ip    = None
-    cam_name  = __setting__('name' + str(i))
-    cam_ip    = __setting__('ipaddress' + str(i))
+    cam_name  = None or __setting__('name' + str(i))
+    cam_ip    = None or __setting__('ipaddress' + str(i))
     cam_usr   = __setting__('username' + str(i))
     cam_pwd   = __setting__('password' + str(i))
     if cam_name and cam_ip:
