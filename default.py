@@ -148,6 +148,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         self.cams.append(self.cam)
         self.active_cam = 0
+        self.session = None
 
         self.button_cam = []
 
@@ -167,6 +168,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.type  = 'mp4'
 
         log('Addon started.')
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
         # placeControl(obj, row, column, rowspan=, columnspan=)
 
@@ -191,7 +193,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.placeControl(self.button_mprev, 4, 1)
         self.connect(self.button_mprev, self.set_month('-')) # self.month_prev)
 
-        self.label_month = pyxbmct.Label(str(self.date['Month']), alignment=pyxbmct.ALIGN_CENTER)
+        self.label_month = pyxbmct.Label(str(self.date['Month']), textColor=self.BLUE, alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.label_month, 4, 2)
 
         self.button_mnext = pyxbmct.Button('>')
@@ -206,7 +208,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.placeControl(self.button_yprev, 4, 5)
         self.connect(self.button_yprev, self.set_year('-')) # self.year_prev)
 
-        self.label_year = pyxbmct.Label(str(self.date['Year']), alignment=pyxbmct.ALIGN_CENTER)
+        self.label_year = pyxbmct.Label(str(self.date['Year']), textColor=self.BLUE, alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(self.label_year, 4, 6)
 
         self.button_ynext = pyxbmct.Button('>')
@@ -311,6 +313,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.placeControl(self.button_dnld, 16, 12, columnspan=2)
         self.button_dnld.setEnableCondition('Integer.IsGreater(Control.GetLabel('+ str(tid) +'),0)')
         self.connect(self.button_dnld, self.download)
+
+        xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
         self.update_calendar()
 
@@ -439,8 +443,17 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def auth_get(self, url, *args, **kwargs):
+        if not self.session:
+            self.session = requests.Session()
+
+        #if self.auth == 'digest':
+        #    auth = HTTPDigestAuth(*args)
+        #else
+        #    auth = HTTPBasicAuth(*args)
+
         # Dahua cams use Digest Authentication scheme
-        return requests.get(url, stream=True, auth=HTTPDigestAuth(*args), **kwargs)
+        return self.session.get(url, stream=True, auth=HTTPDigestAuth(*args), **kwargs)
+        #return requests.get(url, stream=True, auth=HTTPDigestAuth(*args), **kwargs)
 
         # Auth Scheme Mapping for Requets
         AUTH_MAP = {
@@ -526,6 +539,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         def update_cam():
             self.cam = self.cams[index]
             self.active_cam = index
+            self.session = None
 
             self.update_system()
             self.update_list()
