@@ -445,40 +445,23 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
     def auth_get(self, url, *args, **kwargs):
         if not self.session:
             self.session = requests.Session()
+            # Dahua cams use Digest Authentication scheme
+            self.session.auth = HTTPDigestAuth(*args)
 
-        #if self.auth == 'digest':
-        #    auth = HTTPDigestAuth(*args)
-        #else
-        #    auth = HTTPBasicAuth(*args)
-
-        # Dahua cams use Digest Authentication scheme
-        return self.session.get(url, stream=True, auth=HTTPDigestAuth(*args), **kwargs)
-        #return requests.get(url, stream=True, auth=HTTPDigestAuth(*args), **kwargs)
-
-        # Auth Scheme Mapping for Requets
-        AUTH_MAP = {
-            'basic': HTTPBasicAuth,
-            'digest': HTTPDigestAuth,
-            }
-
-        r = requests.get(url, **kwargs)
-
-        if r.status_code != 401:
-            return r
-
-        auth_scheme = r.headers['WWW-Authenticate'].split(' ')[0]
-        auth = AUTH_MAP.get(auth_scheme.lower())
-
-        if not auth:
-            raise ValueError('Unknown authentication scheme')
-
-        r = requests.get(url, auth=auth(*args), **kwargs)
+        try:
+            r = self.session.get(url, **kwargs)
+        #except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.RequestException as e:
+            r = None
+            self.session = None
+            log(e)
 
         return r
+        #return requests.get(url, auth=HTTPDigestAuth(*args), **kwargs)
 
 
     def system_status(self):
-        r = self.auth_get(self.STORAGE_INFO.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
+        r = self.auth_get(self.STORAGE_INFO.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'], stream=True)
 
         if r.status_code == 200:
             data = r.text.split('\r\n')
@@ -512,7 +495,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def system_info(self):
-        r = self.auth_get(self.SYSTEM_INFO.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
+        r = self.auth_get(self.SYSTEM_INFO.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'], stream=True)
 
         if r.status_code == 200:
             data = r.text.split('\r\n')
@@ -637,10 +620,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         items = []
         numitems = 0
 
-        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
-
         # Create a mediaFileFinder
-        r = self.auth_get(self.MEDIA_FINDER_CREATE.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'])
+        r = self.auth_get(self.MEDIA_FINDER_CREATE.format(self.cam['IPAddr']), self.cam['User'], self.cam['Password'], stream=True)
         if r.status_code == 200:
             data = r.text.split('\r\n')
             objectId = data[0].split('=')[1]
@@ -648,13 +629,13 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             # Start findFile
             r = self.auth_get(self.MEDIA_FINDER_FINDFILE.format(self.cam['IPAddr'],
                     objectId, channel,start_date, end_date, self.type),
-                    self.cam['User'], self.cam['Password'])
+                    self.cam['User'], self.cam['Password'], stream=True)
             success = (r.text == 'OK\r\n')
 
             # findNextFile
             while success:
                 r = self.auth_get(self.MEDIA_FINDER_FINDNEXT.format(self.cam['IPAddr'],
-                        objectId, count), self.cam['User'], self.cam['Password'])
+                        objectId, count), self.cam['User'], self.cam['Password'], stream=True)
                 if r.status_code == 200:
                     # Fields in Response:
                     #   found                  Count of found file, found is 0 if no file is found.
@@ -707,11 +688,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
             # Close and destroy the mediaFileFinder
             r = self.auth_get(self.MEDIA_FINDER_CLOSE.format(self.cam['IPAddr'],
-                    objectId), self.cam['User'], self.cam['Password'])
+                    objectId), self.cam['User'], self.cam['Password'], stream=True)
             r = self.auth_get(self.MEDIA_FINDER_DESTROY.format(self.cam['IPAddr'],
-                    objectId), self.cam['User'], self.cam['Password'])
-
-        xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+                    objectId), self.cam['User'], self.cam['Password'], stream=True)
 
         return items
 
@@ -721,7 +700,13 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.label_total.setLabel(str(self.list.size()))
         self.update_info()
 
-        self.items = self.get_items()
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+
+        try:
+            self.items = self.get_items()
+        except:
+            self.items = []
+            self.label_system['ErrState'].setLabel(dlgError)
 
         #for index, item in enumerate(self.items):
         for item in self.items:
@@ -736,6 +721,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             self.list.addItem(li)
 
         self.label_total.setLabel(str(self.list.size()))
+
+        xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
         if self.list.size() > 0:
             self.list.selectItem(selected)
@@ -835,7 +822,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
-        r = self.auth_get(cmd, self.cam['User'], self.cam['Password'])
+        r = self.auth_get(cmd, self.cam['User'], self.cam['Password'], stream=True)
         if r.status_code == 200:
             #r.raw.decode_content = True
             with open(destfile, 'wb') as out:
