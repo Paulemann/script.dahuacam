@@ -7,9 +7,7 @@ The addon is still at an experimental stage which, however, works quite reliable
 
 Navigation is pretty straight forward: After setting the file type and date the addon will query the cam for available files and displays them in a list. You can move up and down and select an item by pressing 'ok' or 'enter' on your remote to show additional info for the selected file below the list. For jpg files a small preview picture is shown. For video sequences you can start playback of the selected item by pressing the 'play' button on your remote. This way, the focus stays on the list and you can easily select the next item after returning from playback. Prior to playback, video files are downloaded to a temporary location. This means you will notice some delay before the video starts. 
 
-The addon can be configured for up to 4 cameras. The active device is selectable in the dialog.
-
-Occasionally, an API call may fail or return incomplete data - particularly if a large amount of data is collected. This will have the effect of an incomplete or empty item list and/or a preview not showing up. In this case, the addon will capture the error and display it in the 'error status' field of the dialog. The easiest way to recover from such situations is to simply repeat the last action.
+Occasionally, an API call may fail or return incomplete data - particularly if a large amount of data is collected. In this case the addon will send a message with the captured error to the kodi log. However, you will probably not notice this in the dialog itself except for an incomplete item list or a preview not showing up (I might consider updating the status prompt to inform the user). The easiest way to recover from such situations is to simply repeat the previous action.
 
 As in some of my other addons, I used PyXBMCt to create the dialog window. Unfortunately, the startup time of the addon increases with the number of elements the dialog contains. So, please, don't get nervous when the dialog window doesn't instantly pop up after starting the addon. If you have any idea how to speed this up, please drop me a note or - even better - a pull request.
 

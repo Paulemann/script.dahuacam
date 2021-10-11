@@ -81,6 +81,11 @@ if not cam_name or not cam_ip:
 
 tmpdir    = os.path.join(xbmc.translatePath(__profile__).decode('utf-8'), 'tmp') # '/home/kodi/tmp'
 
+dlddir    = __setting__('savedir')
+if not dlddir:
+    dlddir = xbmc.translatePath(__profile__).decode('utf-8')
+    __addon__.setSetting(id='savedir', value=dlddir)
+
 ACTION_PLAY = 79
 
 
@@ -167,6 +172,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.items = []
         self.type  = 'mp4'
 
+        self.selected_item = None
+
         log('Addon started.')
         xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
@@ -241,19 +248,19 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         self.label_info['txtStartTime'] = pyxbmct.Label(dlgStartTime, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['txtStartTime'], 12, 9, columnspan=2)
 
-        self.label_info['StartTime'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['StartTime'] = pyxbmct.Label('', font='font10', textColor=self.BLUE, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['StartTime'], 12, 11, columnspan=3)
 
         self.label_info['txtEndTime'] = pyxbmct.Label(dlgEndTime, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['txtEndTime'], 13, 9, columnspan=2)
 
-        self.label_info['EndTime'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['EndTime'] = pyxbmct.Label('', font='font10', textColor=self.BLUE, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['EndTime'], 13, 11, columnspan=3)
 
         self.label_info['txtFileSize'] = pyxbmct.Label(dlgFileSize, font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['txtFileSize'], 14, 9, columnspan=2)
 
-        self.label_info['FileSize'] = pyxbmct.Label('', font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_LEFT)
+        self.label_info['FileSize'] = pyxbmct.Label('', font='font10', textColor=self.BLUE, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(self.label_info['FileSize'], 14, 11, columnspan=3)
 
         for col, day in enumerate(dlgWeekDays):
@@ -745,19 +752,20 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             self.image_preview.setVisible(False)
 
         if self.list.size() > 0:
-            item = self.items[self.list.getSelectedPosition()]
+            self.selected_item = self.items[self.list.getSelectedPosition()]
             if self.type == 'jpg':
                 # show preview of image in info section
-                tmpfile = self.download(item=item, destdir=tmpdir)
+                tmpfile = self.download(item=self.selected_item, destdir=tmpdir)
                 self.image_preview.setImage(tmpfile or '', False)
                 xbmc.sleep(500)
                 xbmcvfs.delete(tmpfile)
             else:
                 # show file info
-                self.label_info['StartTime'].setLabel(item['StartTime']) #.split()[1])
-                self.label_info['EndTime'].setLabel(item['EndTime']) #.split()[1])
-                self.label_info['FileSize'].setLabel('{} (KB)'.format(int(round(int(item['Length'])/1024.0, 0))))
+                self.label_info['StartTime'].setLabel(self.selected_item['StartTime']) #.split()[1])
+                self.label_info['EndTime'].setLabel(self.selected_item['EndTime']) #.split()[1])
+                self.label_info['FileSize'].setLabel('{} (KB)'.format(int(round(int(self.selected_item['Length'])/1024.0, 0))))
         else:
+            self.selected_item = None
             if self.type == 'jpg':
                 self.image_preview.setImage('', False)
             else:
@@ -769,11 +777,13 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def play(self, item=None):
-        if self.type == 'jpg' or  self.list.getSelectedPosition() < 0: # self.list.size() == 0
+        if self.type == 'jpg':
             return
 
         if not item:
-            item = self.items[self.list.getSelectedPosition()]
+            if not self.selected_item:
+                return
+            item = self.selected_item
 
         #cmd = 'http://{}/cgi-bin/playBack.cgi?action=getStream&channel=1&subtype=0&startTime={}&endTime={}'.format(self.cam['IPAddr'], item['StartTime'], item['EndTime'])
         #cmd = 'rtsp://{}/{}'.format(self.cam['IPAddr'], item['FilePath'])
@@ -797,14 +807,14 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
 
     def download(self, item=None, destdir=None, name=None):
-        if self.list.getSelectedPosition() < 0: # self.list.size() == 0
-            return
-
         if not item:
-            item = self.items[self.list.getSelectedPosition()]
+            if not self.selected_item:
+                return
+            item = self.selected_item
 
         if not destdir:
-            destdir = xbmc.translatePath(__profile__).decode('utf-8')
+            #destdir = xbmc.translatePath(__profile__).decode('utf-8')
+            destdir = dlddir
 
         if not xbmcvfs.exists(destdir):
             xbmcvfs.mkdir(destdir)
