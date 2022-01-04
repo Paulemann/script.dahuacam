@@ -135,8 +135,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
     def __init__(self, name, ip, user, password):
         # You need to call base class' constructor.
         super(DahuaCamPlayback, self).__init__(dlgTitle)
-        # Set the window width, height and the grid resolution: 20 rows, 15 columns.
-        #self.setGeometry(640, 480, 20, 15)
+        # Set the window width, height and the grid resolution: 18 rows, 15 columns.
         self.setGeometry(880, 600, 18, 15)
 
         self._monitor = xbmc.Monitor()
@@ -295,7 +294,6 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         # Create the 'Close' button.
         self.button_close = pyxbmct.Button(dlgBtnClose)
         self.placeControl(self.button_close, 16, 1, columnspan=2)
-        #self.setFocus(self.button_close)
         self.connect(self.button_close, self.close)
 
         for i in range(4):
@@ -422,7 +420,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         return
 
 
-    def update_calendar(self):
+    def update_calendar(self, focus=True):
         currentDay   = datetime.now().day
         currentMonth = datetime.now().month
         currentYear  = datetime.now().year
@@ -444,7 +442,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 self.button_cal[row * 7 + col].setVisible(weekday > 0)
 
         self.set_navigation()
-        self.update_list()
+        self.update_list(focus=focus)
 
         return
 
@@ -559,9 +557,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
     def set_year(self, dir='+'):
         def update_year():
+            currentYear  = datetime.now().year
+            currentMonth = datetime.now().month
             if dir =='+':
-                currentYear   = datetime.now().year
-                currentMonth  = datetime.now().month
                 if self.date['Year'] < currentYear:
                     self.date['Year'] += 1
                     if self.date['Year'] == currentYear and self.date['Month'] > currentMonth:
@@ -575,37 +573,28 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                 else:
                     return
             self.label_year.setLabel(str(self.date['Year']))
-            self.update_calendar()
-
-            self.setFocus(self.button_ynext if dir == '+' else self.button_yprev)
+            self.update_calendar(focus=False)
 
         return update_year
 
 
     def set_month(self, dir='+'):
         def update_month():
+            currentYear  = datetime.now().year
+            currentMonth = datetime.now().month
             if dir == '+':
-                currentYear   = datetime.now().year
-                currentMonth  = datetime.now().month
-                #if (self.date['Year'] == currentYear and self.date['Month'] < currentMonth) or (self.date['Year'] < currentYear and self.date['Month'] < 12):
-                #    self.date['Month'] += 1
                 if (self.date['Year'] == currentYear and self.date['Month'] < currentMonth) or (self.date['Year'] < currentYear):
                     self.date['Month'] = self.date['Month'] % 12 + 1
                 else:
                     return
             else: # dir == '-'
-                currentYear   = datetime.now().year
-                currentMonth  = datetime.now().month
                 if self.date['Month'] > 1:
                     self.date['Month'] -= 1
                 else:
-                    #return
                     self.date['Month'] = 12 if self.date['Year'] < currentYear else currentMonth
             self.date['Day'] = 1
             self.label_month.setLabel(str(self.date['Month']))
-            self.update_calendar()
-
-            self.setFocus(self.button_mnext if dir == '+' else self.button_mprev)
+            self.update_calendar(focus=False)
 
         return update_month
 
@@ -711,7 +700,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         return items
 
 
-    def update_list(self, selected=0):
+    def update_list(self, selected=0, focus=True):
         self.list.reset()
         self.label_total.setLabel(str(self.list.size()))
         self.update_info()
@@ -724,7 +713,6 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             self.items = []
             self.label_system['ErrState'].setLabel(dlgError)
 
-        #for index, item in enumerate(self.items):
         for item in self.items:
             try:
                 if 'Events[0]' in item:
@@ -742,9 +730,10 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         if self.list.size() > 0:
             self.list.selectItem(selected)
-            self.setFocus(self.list)
+            if focus:
+                self.setFocus(self.list)
             self.update_info()
-        else:
+        elif focus:
             self.setFocus(self.button_cal[self.date['Day'] + self.month_offset - 1])
 
         return
