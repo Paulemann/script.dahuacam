@@ -49,7 +49,7 @@ dlgBtnSave    = __localize__(33013)         # 'Sichern'
 dlgStatus     = __localize__(33014)         # '{}% von {} MB belegt'
 dlgError      = __localize__(33015)         # 'Ein Fehler is aufgetreten'
 dlgRecordType = __localize__(33016)         # 'Aufnahmetyp'
-dlgHint       = __localize__(33017)         # "'PLay' drücken, um Video zu starten"
+dlgHint       = __localize__(33017)         # "'Play' drücken, um Video zu starten"
 dlgWeekDays   = [
                     __localize__(33020),
                     __localize__(33021),
@@ -577,6 +577,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             self.label_year.setLabel(str(self.date['Year']))
             self.update_calendar()
 
+            self.setFocus(self.button_ynext if dir == '+' else self.button_yprev)
+
         return update_year
 
 
@@ -585,18 +587,25 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             if dir == '+':
                 currentYear   = datetime.now().year
                 currentMonth  = datetime.now().month
-                if (self.date['Year'] == currentYear and self.date['Month'] < currentMonth) or (self.date['Year'] < currentYear and self.date['Month'] < 12):
-                    self.date['Month'] += 1
+                #if (self.date['Year'] == currentYear and self.date['Month'] < currentMonth) or (self.date['Year'] < currentYear and self.date['Month'] < 12):
+                #    self.date['Month'] += 1
+                if (self.date['Year'] == currentYear and self.date['Month'] < currentMonth) or (self.date['Year'] < currentYear):
+                    self.date['Month'] = self.date['Month'] % 12 + 1
                 else:
                     return
             else: # dir == '-'
+                currentYear   = datetime.now().year
+                currentMonth  = datetime.now().month
                 if self.date['Month'] > 1:
                     self.date['Month'] -= 1
                 else:
-                    return
+                    #return
+                    self.date['Month'] = 12 if self.date['Year'] < currentYear else currentMonth
             self.date['Day'] = 1
             self.label_month.setLabel(str(self.date['Month']))
             self.update_calendar()
+
+            self.setFocus(self.button_mnext if dir == '+' else self.button_mprev)
 
         return update_month
 
@@ -781,6 +790,8 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             return
 
         if not item:
+            self.update_info()
+
             if not self.selected_item:
                 return
             item = self.selected_item
