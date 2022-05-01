@@ -100,9 +100,10 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
     GREY  = '0xAAFFFFFF'
 
     MEDIA_FINDER_CREATE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=factory.create'
-    MEDIA_FINDER_FINDFILE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findFile&object={} \
-        &condition.Channel={}&condition.StartTime={}&condition.EndTime={} \
-        &condition.Types[0]={}'
+    MEDIA_FINDER_FINDFILE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findFile&object={}' + \
+        '&condition.Channel={}&condition.StartTime={}&condition.EndTime={}' + \
+        '&condition.Types[0]={}'
+    #MEDIA_FINDER_FINDFILE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findFile&object={}&condition.Channel={}&condition.StartTime={}&condition.EndTime={}&condition.Types[0]={}'
         # http://<server>/cgi-bin/mediaFileFind.cgi?action=findFile
         #    &object=<objectId>
         #    &condition.Channel=<ChannelNo>
