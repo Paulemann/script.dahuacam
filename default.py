@@ -102,7 +102,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
     MEDIA_FINDER_CREATE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=factory.create'
     MEDIA_FINDER_FINDFILE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findFile&object={}' + \
         '&condition.Channel={}&condition.StartTime={}&condition.EndTime={}' + \
-        '&condition.Types[0]={}'
+        '&condition.Types[0]={}' + \
+        '&condition.Flags[0]=Event'
+        #'&condition.Events[0]=AlarmLocal&condition.Events[1]=VideoMotion'
     #MEDIA_FINDER_FINDFILE = 'http://{}/cgi-bin/mediaFileFind.cgi?action=findFile&object={}&condition.Channel={}&condition.StartTime={}&condition.EndTime={}&condition.Types[0]={}'
         # http://<server>/cgi-bin/mediaFileFind.cgi?action=findFile
         #    &object=<objectId>
@@ -112,7 +114,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         # Optional:
         #    &condition.Dirs[0]=<dir>
         #    &condition.Types[0]=<type>
-        #    &condition.Flag[0]=<flag>
+        #    &condition.Flags[0]=<flag>
         #    &condition.Events[0]=<event>
         #    &condition.VideoStream= <stream>
         # Input Arguments:
@@ -716,13 +718,30 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
 
         for item in self.items:
             try:
-                if 'Events[0]' in item:
-                    li = '{} {}: {}'.format(item['StartTime'].split()[1], item['Flags[0]'], item['Events[0]'])
+                if 'StartTime' in item:
+                    li = '{}'.format(item['StartTime'].split()[1])
+		elif self.type == 'jpg':
+                    li = '{}'.format(item['EndTime'].split()[1])
                 else:
-                    li = '{} {}'.format(item['StartTime'].split()[1], item['Flags[0]'])
-            except:
-                li = '*** Error ***'
-                pass
+                    continue
+
+                if 'Flags[0]' in item:
+                   li = li + ' {}'.format(item['Flags[0]'])
+                #elif 'Events[0]' in item:
+                #   li = li + ' Event'
+
+                if 'Events[0]' in item:
+                   li = li + ': {}'.format(item['Events[0]'])
+
+                #if 'Events[0]' in item:
+                #    li = '{} {}: {}'.format(item['StartTime'].split()[1], item['Flags[0]'], item['Events[0]'])
+                #else:
+                #    li = '{} {}'.format(item['StartTime'].split()[1], item['Flags[0]'])
+            except Exception as e:
+            #    li = '*** Error ***'
+            #    pass
+                log('Exception {}: {} in item: {}'.format(type(e).__name__, e, item))
+                continue
             self.list.addItem(li)
 
         self.label_total.setLabel(str(self.list.size()))
