@@ -18,18 +18,21 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 
-
 # Enable or disable Estuary-based design explicitly
 pyxbmct.skin.estuary = True
 
 # Set plugin variables
 __addon__        = xbmcaddon.Addon()
 __addon_id__     = __addon__.getAddonInfo('id')
+__addon_name__   = __addon__.getAddonInfo('name')
 __addon_path__   = __addon__.getAddonInfo('path')
 __profile__      = __addon__.getAddonInfo('profile')
 
 __setting__      = __addon__.getSetting
 __localize__     = __addon__.getLocalizedString
+
+__list_bg__        = os.path.join(__addon_path__, 'resources', 'media', 'background.png')
+__texture_nf__     = os.path.join(__addon_path__, 'resources', 'media', 'texture-nf.png')
 
 # Localization
 dlgTitle      = __localize__(33000)         # 'Dahua Cam Playback'
@@ -60,8 +63,25 @@ dlgWeekDays   = [
                     __localize__(33026)
                 ] # ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
+if sys.version_info.major < 3:
+    INFO = xbmc.LOGNOTICE
+else:
+    INFO = xbmc.LOGINFO
+DEBUG = xbmc.LOGDEBUG
+
+
+def log(message,loglevel=INFO):
+    xbmc.log(msg='[{}] {}'.format(__addon_id__, message), level=loglevel)
+
+
+def translatePath(path):
+    if sys.version_info.major < 3:
+        return xbmc.translatePath(path).decode()
+    else:
+        return xbmcvfs.translatePath(path)
+
 # Settings
-settings = os.path.join(xbmc.translatePath(__profile__).decode('utf-8'), 'settings.xml')
+settings = os.path.join(translatePath(__profile__), 'settings.xml')
 
 cam_name  = None         # 'DahuaCam'
 cam_ip    = None         # '10.10.10.10'
@@ -79,18 +99,17 @@ cam_pwd   = __setting__('password')
 if not cam_name or not cam_ip:
     raise SystemExit
 
-tmpdir    = os.path.join(xbmc.translatePath(__profile__).decode('utf-8'), 'tmp') # '/home/kodi/tmp'
+tmpdir    = os.path.join(translatePath(__profile__), 'tmp') # '/home/kodi/tmp'
 
 dlddir    = __setting__('savedir')
 if not dlddir:
-    dlddir = xbmc.translatePath(__profile__).decode('utf-8')
+    dlddir = translatePath(__profile__)
     __addon__.setSetting(id='savedir', value=dlddir)
 
+timeout = 10 # __setting__('timeout')
+notify  = True	# __setting__('notify')
+
 ACTION_PLAY = 79
-
-
-def log(message,loglevel=xbmc.LOGNOTICE):
-    xbmc.log(msg='[{}] {}'.format(__addon_id__, message), level=loglevel)
 
 
 class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
@@ -184,11 +203,11 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         label = pyxbmct.Label(dlgFileType, alignment=pyxbmct.ALIGN_LEFT)
         self.placeControl(label, 1, 1, columnspan=2)
 
-        self.radio_jpg = pyxbmct.RadioButton('jpg')
+        self.radio_jpg = pyxbmct.RadioButton('jpg', noFocusTexture=__texture_nf__)
         self.placeControl(self.radio_jpg, 1, 4, columnspan=2)
         self.connect(self.radio_jpg, self.set_type('jpg'))
 
-        self.radio_mp4 = pyxbmct.RadioButton('mp4')
+        self.radio_mp4 = pyxbmct.RadioButton('mp4', noFocusTexture=__texture_nf__)
         self.placeControl(self.radio_mp4, 1, 6, columnspan=2)
         self.connect(self.radio_mp4, self.set_type('mp4'))
 
@@ -235,7 +254,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         label = pyxbmct.Label(dlgRecordType[:-1], font='font10', textColor=self.GREY, alignment=pyxbmct.ALIGN_CENTER)
         self.placeControl(label, 2, 11, columnspan=2)
 
-        self.list = pyxbmct.List(_space=-1, _itemTextXOffset=-3, _itemTextYOffset=-1, _alignmentY=0) #XBFONT_LEFT
+        self.list_bg = pyxbmct.Image(__list_bg__)
+        self.placeControl(self.list_bg, 3, 9, rowspan=9, columnspan=5)
+        self.list = pyxbmct.List(_space=-1, _itemTextXOffset=-3, _itemTextYOffset=-1, _alignmentY=0, buttonTexture=__texture_nf__) #XBFONT_LEFT
         self.placeControl(self.list, 3, 9, rowspan=10, columnspan=5)
         # Connect the list to a function to display which list item is selected.
         self.connect(self.list, self.update_info)
@@ -456,16 +477,21 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             # Dahua cams use Digest Authentication scheme
             self.session.auth = HTTPDigestAuth(*args)
 
+        # set default timeout value if none is specified
+        if 'timeout' not in kwargs.keys():
+            kwargs['timeout'] = timeout
+
         try:
-            r = self.session.get(url, **kwargs)
+            #return requests.get(url, auth=HTTPDigestAuth(*args), **kwargs)
+            return self.session.get(url, **kwargs)
+
         #except requests.exceptions.ConnectionError as e:
         except requests.exceptions.RequestException as e:
-            r = None
             self.session = None
-            log(e)
-
-        return r
-        #return requests.get(url, auth=HTTPDigestAuth(*args), **kwargs)
+            if notify:
+                xbmc.executebuiltin('Notification({}, {}, {})'.format(__addon_name__, 'auth_get: ' + str(e), timeout*1000/2))
+            log('auth_get: ' + str(e))
+            return None
 
 
     def system_status(self):
@@ -490,7 +516,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                log(e)
+                if notify:
+                    xbmc.executebuiltin('Notification({}, {}, {})'.format(__addon_name__, 'system_status: ' + str(e), timeout*1000/2))
+                log('system_status: ' + str(e))
                 self.label_system['ErrState'].setLabel('{}'.format(e))
             return None
 
@@ -519,7 +547,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                log(e)
+                if notify:
+                    xbmc.executebuiltin('Notification({}, {}, {})'.format(__addon_name__, 'system_info: ' + str(e), timeout*1000/2))
+                log('system_info: ' + str(e))
                 self.label_system['ErrState'].setLabel('{}'.format(e))
             return None
 
@@ -685,7 +715,9 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
                     try:
                         r.raise_for_status()
                     except requests.exceptions.HTTPError as e:
-                        log(e)
+                        if notify:
+                            xbmc.executebuiltin('Notification({}, {}, {})'.format(__addon_name__, 'get_items: ' + str(e), timeout*1000/2))
+                        log('get_items:' + str(e))
                         self.label_system['ErrState'].setLabel('{}'.format(e))
                     break
 
@@ -720,7 +752,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             try:
                 if 'StartTime' in item:
                     li = '{}'.format(item['StartTime'].split()[1])
-		elif self.type == 'jpg':
+                elif self.type == 'jpg':
                     li = '{}'.format(item['EndTime'].split()[1])
                 else:
                     continue
@@ -833,7 +865,7 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
             item = self.selected_item
 
         if not destdir:
-            #destdir = xbmc.translatePath(__profile__).decode('utf-8')
+            #destdir = translatePath(__profile__)
             destdir = dlddir
 
         if not xbmcvfs.exists(destdir):
@@ -846,9 +878,12 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         # item['FilePath'] = e.g. /mnt/sd/2020-10-11/001/jpg/21/09/14[M][0@0][0].jpg
 
         if not name:
-            name = '{}_{}_{}.{}'.format(self.cam['Name'], item['StartTime'].split()[0], item['StartTime'].split()[1].replace(':', '.'), path[-3:]).decode('utf-8')
+            name = '{}_{}_{}.{}'.format(self.cam['Name'], item['StartTime'].split()[0], item['StartTime'].split()[1].replace(':', '.'), path[-3:])
 
-        destfile = os.path.join(destdir, name)
+        try: # python 2
+            destfile = os.path.join(destdir, name.decode())
+        except: # python 3
+            destfile = os.path.join(destdir, name)
 
         xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
@@ -856,15 +891,23 @@ class DahuaCamPlayback(pyxbmct.AddonDialogWindow):
         if r.status_code == 200:
             #r.raw.decode_content = True
             with open(destfile, 'wb') as out:
-                out.write(r.content)
-                #shutil.copyfileobj(r.raw, out)
+                try:
+                    out.write(r.content)
+                    #shutil.copyfileobj(r.raw, out)
+                except Exception as e:
+                    if notify:
+                        xbmc.executebuiltin('Notification({}, {}, {})'.format(__addon_name__, 'download: ' + str(e), timeout*1000/2))
+                    log('download: ' + str(e))
+
             self.label_system['ErrState'].setLabel('')
         else:
             log('Failed downloading: {}'.format(destfile))
             try:
                 r.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                log(e)
+                if notify:
+                    xbmc.executebuiltin('Notification({}, {}, {})'.format(__addon_name__, 'download: ' + str(e), timeout*1000/2))
+                log('download: ' + str(e))
                 self.label_system['ErrState'].setLabel('{}'.format(e))
 
         xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
