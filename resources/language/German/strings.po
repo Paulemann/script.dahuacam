@@ -36,10 +36,6 @@ msgctxt "#32004"
 msgid "Password:"
 msgstr "Passwort:"
 
-msgctxt "#32005"
-msgid "Download folder:"
-msgstr "Ordner für Downloads:"
-
 msgctxt "#32010"
 msgid "Camera 2"
 msgstr "Kamera 2"
@@ -55,6 +51,38 @@ msgstr "Kamera 4"
 msgctxt "#32040"
 msgid "General"
 msgstr "Allgemein"
+
+msgctxt "#32041"
+msgid "Download folder:"
+msgstr "Ordner für Downloads:"
+
+msgctxt "#32042"
+msgid "Timeout for Requests (in Secs):"
+msgstr "Allg. Zeitüberschreitung (in Sek.):"
+
+msgctxt "#32043"
+msgid "Timeout for Media Search (in Secs):"
+msgstr "Zeitüberschreitung bei der Mediensuche (in Sek.):"
+
+msgctxt "#32044"
+msgid "Show/Play Media in Full Screen Mode:"
+msgstr "Für Medienwiedergabe 'Full Screen' nutzen:"
+
+msgctxt "#32045"
+msgid "Show Error Notifications in GUI:"
+msgstr "Fehlermeldungens in Benutzeroberfläche anzeigen:"
+
+msgctxt "#32046"
+msgid "Use Stream in Live View:"
+msgstr "Verwende Stream in Live-Anzeige:"
+
+msgctxt "#32047"
+msgid "Main Stream"
+msgstr "Main-Stream"
+
+msgctxt "#32048"
+msgid "Sub Stream"
+msgstr "Sub-Stream"
 
 msgctxt "#33000"
 msgid "Dahua Cam Playback"
@@ -125,8 +153,16 @@ msgid "Record Type:"
 msgstr "Aufnahmetyp:"
 
 msgctxt "#33017"
-msgid "Press 'Play' to start video"
-msgstr "'Play' drücken, um Video zu starten"
+msgid "Storage:"
+msgstr "Speicher:"
+
+msgctxt "#33018"
+msgid "Show"
+msgstr "Anzeigen"
+
+msgctxt "#33019"
+msgid "Live"
+msgstr "Live"
 
 msgctxt "#33020"
 msgid "Mo"
@@ -155,3 +191,11 @@ msgstr "Sa"
 msgctxt "#33026"
 msgid "Su"
 msgstr "So"
+
+msgctxt "#34001"
+msgid "Press 'Play' to play/show file"
+msgstr "zur Wiedergabe/Anzeige der Datei 'Play' drücken"
+
+msgctxt "#34002"
+msgid "Selection:"
+msgstr "Auswahl:"

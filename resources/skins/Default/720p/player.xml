@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window id="1100" type="dialog">
+   <defaultcontrol>2</defaultcontrol>
+    <coordinates>
+        <left>200</left>
+        <top>105</top>
+        <width>880</width>
+        <height>555</height>
+    </coordinates>
+    <controls>
+        <control type="image" id="1101">
+            <description>Overlay image</description>
+            <left>0</left>
+            <top>0</top>
+            <width>880</width>
+            <height>555</height>
+            <visible>true</visible>
+            <texture>background2.png</texture>
+            <aspectratio>scale</aspectratio>
+        </control>
+        <!-- Video Control -->
+        <control type="videowindow" id="1102">
+            <left>0</left>
+            <top>0</top>
+            <width>880</width>
+            <height>555</height>
+            <visible>true</visible>
+            <aspectratio>scale</aspectratio>
+        </control>
+    </controls>
+</window>
+

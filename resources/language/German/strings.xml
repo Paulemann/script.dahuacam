@@ -5,11 +5,18 @@
   <string id="32002">IP-Adresse:</string>
   <string id="32003">Benutzer:</string>
   <string id="32004">Passwort:</string>
-  <string id="32005">Ordner für Downloads:</string>
   <string id="32010">Kamera 2</string>
   <string id="32020">Kamera 3</string>
   <string id="32030">Kamera 4</string>
   <string id="32040">Allgemein</string>
+  <string id="32041">Ordner für Downloads:</string>
+  <string id="32042">Allg. Zeitüberschreitung (in Sek.):</string>
+  <string id="32043">Zeitüberschreitung bei der Mediensuche (in Sek.):</string>
+  <string id="32044">Für Medienwiedergabe 'Full Screen' nutzen:</string>
+  <string id="32045">Fehlermeldungens in Benutzeroberfläche anzeigen:</string>
+  <string id="32046">Verwende Stream in Live-Anzeige:</string>
+  <string id="32047">Main-Stream</string>
+  <string id="32048">Sub-Stream</string>
   <string id="33000">Dahua Cam Playback</string>
   <string id="33001">Dateityp:</string>
   <string id="33002">Kalendermonat:</string>
@@ -27,7 +34,9 @@
   <string id="33014">{}% von {} MB belegt</string>
   <string id="33015">Ein Fehler ist aufgetreten</string>
   <string id="33016">Aufnahmetyp:</string>
-  <string id="33017">'Play' drücken, um Video zu starten</string>
+  <string id="33017">Speicher:</string>
+  <string id="33018">Anzeigen</string>
+  <string id="33019">Live</string>
   <string id="33020">Mo</string>
   <string id="33021">Di</string>
   <string id="33022">Mi</string>
@@ -35,4 +44,6 @@
   <string id="33024">Fr</string>
   <string id="33025">Sa</string>
   <string id="33026">So</string>
+  <string id="34001">Zur Wiedergabe/Anzeige der Datei 'Play' drücken</string>
+  <string id="34002">Auswahl:</string>
 </strings>

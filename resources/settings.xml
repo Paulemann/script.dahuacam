@@ -25,6 +25,11 @@
         <setting label="32004" type="text" id="password4" option="hidden" default="" enable="!eq(-1,)" />
     </category>
     <category label="32040">
-        <setting label="32005" type="folder" id="savedir" source="" option="writeable"/>
+        <setting label="32041" type="folder" id="savedir" source="" option="writeable"/>
+        <setting label="32042" type="number" id="timeout" default="10"/>
+        <setting label="32043" type="number" id="media_timeout" default="50"/>
+        <setting label="32044" type="bool" id="fullscreen" default="false"/>
+        <setting label="32045" type="bool" id="notify" default="true"/>
+        <setting label="32046" type="enum" id="substream" lvalues="32047|32048" default="0"/>
     </category>
 </settings>

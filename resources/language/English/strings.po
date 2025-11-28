@@ -36,10 +36,6 @@ msgctxt "#32004"
 msgid "Password:"
 msgstr ""
 
-msgctxt "#32005"
-msgid "Download folder:"
-msgstr ""
-
 msgctxt "#32010"
 msgid "Camera 2"
 msgstr ""
@@ -54,6 +50,38 @@ msgstr ""
 
 msgctxt "#32040"
 msgid "General"
+msgstr ""
+
+msgctxt "#32041"
+msgid "Download folder:"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Timeout for Requests (in Secs):"
+msgstr ""
+
+msgctxt "#32043"
+msgid "Timeout for Media Search (in Secs):"
+msgstr ""
+
+msgctxt "#32044"
+msgid "Show/Play Media in Full Screen Mode:"
+msgstr ""
+
+msgctxt "#32045"
+msgid "Show Error Notifications in GUI:"
+msgstr ""
+
+msgctxt "#32046"
+msgid "Use Stream in Live View:"
+msgstr ""
+
+msgctxt "#32047"
+msgid "Main Stream"
+msgstr ""
+
+msgctxt "#32048"
+msgid "Sub Stream"
 msgstr ""
 
 msgctxt "#33000"
@@ -125,7 +153,15 @@ msgid "Record Type:"
 msgstr ""
 
 msgctxt "#33017"
-msgid "Press 'Play' to start video:"
+msgid "Storage:"
+msgstr ""
+
+msgctxt "#33018"
+msgid "Show"
+msgstr ""
+
+msgctxt "#33019"
+msgid "Live"
 msgstr ""
 
 msgctxt "#33020"
@@ -154,4 +190,12 @@ msgstr ""
 
 msgctxt "#33026"
 msgid "Su"
+msgstr ""
+
+msgctxt "#34001"
+msgid "Press 'Play' to play/show file"
+msgstr ""
+
+msgctxt "#34002"
+msgid "Selection:"
 msgstr ""

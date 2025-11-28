@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.dahuacam"
    name="Dahua Cam Playback Addon"
-   version="3.0.1"
+   version="4.0.1"
    provider-name="Paulemann">
   <requires>
     <import addon="script.module.pyxbmct" version="1.1.4" />

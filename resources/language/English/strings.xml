@@ -5,11 +5,18 @@
   <string id="32002">IP Address:</string>
   <string id="32003">Username:</string>
   <string id="32004">Password:</string>
-  <string id="32005">Download folder:</string>
   <string id="32010">Camera 2</string>
   <string id="32020">Camera 3</string>
   <string id="32030">Camera 4</string>
   <string id="32040">General</string>
+  <string id="32041">Download folder:</string>
+  <string id="32042">Timeout for Requests (in Secs):</string>
+  <string id="32043">Timeout for Media Search (in Secs):</string>
+  <string id="32044">Show/Play Media in Full Screen Mode:</string>
+  <string id="32045">Show Error Notifications in GUI:</string>
+  <string id="32046">Use Stream in Live View:</string>
+  <string id="32047">Main Stream</string>
+  <string id="32048">Sub Stream</string>
   <string id="33000">Dahua Cam Playback</string>
   <string id="33001">File Type:</string>
   <string id="33002">Calendar Month:</string>
@@ -27,7 +34,9 @@
   <string id="33014">{}% of {} MB in use</string>
   <string id="33015">An error occured</string>
   <string id="33016">Record Type:</string>
-  <string id="33017">Press 'Play' to start video</string>
+  <string id="33017">Storage:</string>
+  <string id="33018">Show</string>
+  <string id="33019">Live</string>
   <string id="33020">Mo</string>
   <string id="33021">Tu</string>
   <string id="33022">We</string>
@@ -35,4 +44,6 @@
   <string id="33024">Fr</string>
   <string id="33025">Sa</string>
   <string id="33026">Su</string>
+  <string id="34001">Press 'Play' to play/show file</string>
+  <string id="34002">Selection:</string>
 </strings>
